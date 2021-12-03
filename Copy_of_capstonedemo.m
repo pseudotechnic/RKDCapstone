@@ -73,6 +73,11 @@ gains.jenga_gains.positionFF = [0 0.05 0.05 0 0];
 
 robot.set('gains', gains.jenga_gains);
 
+robot.set('gains', gains.jenga_gains);
+
+robot.set('gains', gains.jenga_gains);
+
+
 %% Connect to gripper, and initialize some settings properly
 gripper = HebiLookup.newGroupFromNames('16384','gripper');
 gripper.setCommandLifetime(0);
@@ -92,63 +97,56 @@ logFile = robot.startLog('file', fullfile(currentDir, 'robot_data'));
 %% command frequency, in Hz
 frequency = 100;
 
+
 pickupapp = [0.1584, 0.8590, 1.5832, 1.5843, 0.4123]';
-pickuppt = [0.1480, 0.6339, 1.5450, 1.4827, 0.4123]';
+pickuppt = [0.1480, 0.7779, 1.5950, 1.4827, 0.4123]';
 midpoint = [0.5757, 0.9807, 1.6641, 0.7339, 0.4123]';
 
-b11app = [1.0550 0.8181 1.6279 0.8550 0.4154-pi/4]';
 
-b11plc = [1.0550 0.7616 1.6279 0.8550 0.4154-pi/4]';
+b11app = [1.0346 0.6056 1.3191 0.7965 0.4154-pi/4]';
+b11plc = [1.0346 0.5814 1.3163 0.7913 0.4154-pi/4]';
 
-b12app = [1.0272 0.8494 1.7497 0.8648 0.4154-pi/4]';
+b12app = [0.8904 0.7121 1.5775 0.9094 0.4154-pi/4]';
+b12plc = [0.8904 0.6722 1.5702 0.9073 0.4154-pi/4]';
 
-b12plc = [1.0272 0.7894 1.7497 0.8648 0.4154-pi/4]';
-
-b13app = [1.0108 0.8996 1.7778 0.9007 0.4153-pi/4]';
-
-b13plc = [1.0108 0.8496 1.7778 0.9007 0.4153-pi/4]';
+b13app = [0.9404 0.7721 1.6675 0.9094 0.4154-pi/4]';
+b13plc = [0.9404 0.7422 1.6602 0.9073 0.4154-pi/4]';
 
 
+% off towards robot
+b21app = [1.0004 0.8621 1.7575 0.8094 0.4154+pi/4]';
+b21plc = [1.0004 0.7922 1.7802 0.8573 0.4154+pi/4]';
 
-b21app = [1.0661 0.8304 1.7149 0.9092 0.4154-3*pi/4]';
+% too close to 21
+b22app = [0.9304 0.7356 1.6491 0.2265 0.4154+pi/4]';
+b22plc = [0.9304 0.6214 1.6663 0.2213 0.4154+pi/4]';
 
-b21plc = [1.0661 0.7704 1.7149 0.9092 0.4154-3*pi/4]';
-
-b22app = [1.0225 0.8055 1.6359 0.8400 0.4154-3*pi/4]';
-
-b22plc = [1.0225 0.7455 1.6359 0.8400 0.4154-3*pi/4]';
-
-b23app = [0.9868 0.7712 1.5704 0.8176 0.4153-3*pi/4]';
-
-b23plc = [0.9868 0.7012 1.5704 0.8176 0.4154-3*pi/4]';
+b23app = [0.9272 0.7423 1.5915 0.9194 0.4153+pi/4]';
+b23plc = [0.9272 0.6818 1.5926 0.9144 0.4154+pi/4]';
 
 
+b31app = [1.0104 0.8056 1.7491 0.3865 0.4154-pi/4]';
+b31plc = [1.0104 0.7814 1.7863 0.4413 0.4154-pi/4]';
 
-b31app = [0.9613 0.8013 1.5684 0.7867 0.4154-pi/4]';
+b32app = [0.9646 0.8021 1.5075 0.7894 0.4154-pi/4]';
+b32plc = [0.9646 0.7222 1.5502 0.7873 0.4154-pi/4]';
 
-b31plc = [0.9669 0.7670 1.5846 0.8543 0.4154-pi/4]';
+b33app = [0.9604 0.8456 1.7691 0.3865 0.4154-pi/4]';
+b33plc = [0.9604 0.7914 1.7263 0.4413 0.4154-pi/4]';
 
-b32app = [0.9409 0.8368 1.6420 0.8312 0.4154-pi/4]';
 
-b32plc = [0.9390 0.7887 1.6370 0.8486 0.4154-pi/4]';
+dropapp = [b11app b12app b13app];% b21app b22app b23app b31app b32app b33app];
+drop = [b11plc b12plc b13plc];% b21plc b22plc b23plc b31plc b32plc b33plc];
 
-b33app = [0.9120 0.8766 1.7077 0.8726 0.4153-pi/4]';
-
-b33plc = [0.9065 0.8184 1.6979 0.8863 0.4154-pi/4]';
-
-dropapp = [b11app b12app b13app b21app b22app b23app];% b31app b32app b33app];
-drop = [b11plc b12plc b13plc b21plc b22plc b23plc];% b31plc b32plc b33plc];
-
-% 
-% for i=1:size(dropapp,2)
-%     dropapp(4,i) = (dropapp(3,i) - (pi/2 - dropapp(2,i)));
-%     drop(4,i) = (drop(3,i) - (pi/2 - drop(2,i)));
-% end
+for i=1:size(dropapp,2)
+    dropapp(4,i) = (dropapp(3,i) - (pi/2 - dropapp(2,i)));
+    drop(4,i) = (drop(3,i) - (pi/2 - drop(2,i)));
+end
 
 trajectory = trajectory_spline([initial_thetas midpoint pickupapp], [0, 2, 3], frequency);
 command_trajectory(robot, trajectory, frequency);
 
-for l=1:3
+for l=1:size(dropapp,2)
 %pickup
     
     trajectory = trajectory_spline([pickupapp pickuppt], [0, 1], frequency);
