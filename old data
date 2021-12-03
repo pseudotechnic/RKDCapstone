@@ -1,0 +1,40 @@
+
+
+
+%% Moves the robot from the initial position to the first waypoint over 4
+%% seconds.  We break this into 3 seconds to make most of the motion, and 1 for
+%% the final approach.
+
+trajectory = trajectory_spline([initial_thetas midpoint position_1_approach], [0, 2, 3], frequency);
+
+command_trajectory(robot, trajectory, frequency);
+trajectory = trajectory_spline([position_1_approach position_1], [0, 1], frequency);
+command_trajectory(robot, trajectory, frequency);
+
+%% Pick up the object at position 1.  We pause to let the robot stabilize before
+%% moving. NOTE: If you pause more than the length of the command lifetime you
+%% set above, then the robot "goes limp" because the previous position and/or
+%% velocity and torque commands "expire".
+pick(gripper);
+pause(0.75);
+
+%% Move to the second waypoint over 4 seconds, with special "retract" and
+%% "approach" motions that are done more slowly.
+trajectory = trajectory_spline([position_1 position_1_approach], [0, 1], frequency);
+command_trajectory(robot, trajectory, frequency);
+trajectory = trajectory_spline([position_1_approach midpoint position_2_approach], [0, 1, 2], frequency);
+command_trajectory(robot, trajectory, frequency);
+trajectory = trajectory_spline([position_2_approach position_2], [0, 1], frequency);
+command_trajectory(robot, trajectory, frequency);
+
+%% Place the object
+place(gripper);
+pause(0.75);
+
+%% Move back to position 1.
+trajectory = trajectory_spline([position_2 position_2_approach], [0, 1], frequency);
+command_trajectory(robot, trajectory, frequency);
+trajectory = trajectory_spline([position_2_approach midpoint position_1_approach], [0, 1, 2], frequency);
+command_trajectory(robot, trajectory, frequency);
+trajectory = trajectory_spline([position_1_approach position_1], [0, 1], frequency);
+command_trajectory(robot, trajectory, frequency);
